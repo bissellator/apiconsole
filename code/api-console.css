@@ -1,0 +1,33 @@
+// Dropdown menu for GET POST PUT DELETE
+#method {
+  color: #000
+}
+
+#path {
+  width:80%;
+  color:#000;
+}
+
+#addheader {
+  width:25%;
+  color:#000;
+  background-color:#fff
+}
+
+#run {
+  width:10%;
+  color:#fff;
+  background-color:#000
+}
+
+#responseCode {
+  font-weight: bold;
+}
+
+#responseHeaderTitle {
+  font-weight: bold;
+}
+
+#responseHeaders {
+  text-decoration: italic;
+}

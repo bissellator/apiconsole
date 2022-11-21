@@ -1,0 +1,195 @@
+<link rel="stylesheet" type="text/css" href="./api-console.css" />
+
+<div>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.js"></script>
+  <select name="method" id="method" onchange="methodSupport()">
+    <option value="GET">GET</option>
+    <option value="POST">POST</option>
+    <option value="PUT">PUT</option>
+    <option value="DELETE">DELETE</option>
+  </select><input type=text id="path" value="https://api.uxapi.io/"><br />
+  <div id="headers">
+  </div>
+  <input id="addheader" type=button onclick="addHeader()" value="Add Header"><br />
+  <div id="requestPaylod"></div><br />
+  <input type=submit onclick="sendReq()" id="run" value="Run">
+  <hr />
+  <div id="responsePaylod"></div><br />
+
+  <script>
+    function getHeaders() {
+      var ids = []
+      var children = document.getElementById("headers").children; //get container element children.
+      for (var i = 0, len = children.length ; i < len; i++) {
+        ids.push(children[i].id);
+        console.log(document.getElementById(children[i].id + '-value').value)
+      }
+      return(ids)
+    }
+
+    function deleteHeader(headerId) {
+      const element = document.getElementById(headerId);
+      element.remove();
+
+    }
+    function addHeader() {
+      var headerId = makeId()
+      var headers = document.getElementById("headers").innerHTML
+      var newHeader = `<div id="` + headerId + `"><span onclick="deleteHeader(this.parentNode.id)" style="cursor:pointer">&#10060;</span>
+        <select name="` + headerId + `-type" id="` + headerId + `-type">
+          <option value=""></option>
+          <option value="Content-Type">Content-Type</option>
+          <option value="Authorization">Authorization</option>
+        </select>
+        <input type=text style="width:50%" class="" id="` + headerId + `-value" value=""></div>`
+      headers = headers + "\n" + newHeader
+      document.getElementById("headers").innerHTML = headers
+      return
+    }
+
+    function makeId() {
+        var length = 30
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for ( var i = 0; i < length; i++ ) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    function methodSupport() {
+      var method = document.getElementById("method").value
+      if (method == "POST" || method == "PUT") {
+        document.getElementById("requestPaylod").innerHTML = `
+          <Br />
+          <B>Request Payload:</B><br />
+          <textarea style="width:80%;height:50px" id="request"></textarea>
+        `
+      }
+      else {
+        document.getElementById("requestPaylod").innerHTML = ""
+      }
+    }
+
+    function sendReq() {
+      var path = document.getElementById("path").value
+      var method = document.getElementById("method").value
+      if (method == "POST" || method == "PUT") {
+        var payload = document.getElementById("request").value
+      }
+
+      document.getElementById("responsePaylod").innerHTML = `
+        <Br />
+        <div id="responseHeaders"></div><Br/>
+        <B>Response Payload:</B><br />
+        <textarea style="width:100%;height:50px" id="response"></textarea>
+      `
+      // payload = JSON.parse(payload)
+      var response = $.ajax({
+        url: path,
+        async: false,
+        type: method,
+        dataType: 'json',
+        data: payload,
+        beforeSend: function(xhr) {
+          eval(buildHeaders())
+        },
+        success: function(text, status, xhr){
+          var statuscode = statusCode(xhr.status)
+          var headers = statuscode + "<BR />"
+          var responseheaders =  xhr.getAllResponseHeaders()
+          responseheaders = responseheaders.replace(/(?:\r\n|\r|\n)/g, '<br>')
+          headers = headers + `<hr><span id="responseHeaderTitle">Response Headers</span><br/>\n` + responseheaders
+          document.getElementById("responseHeaders").innerHTML = headers
+            if(typeof(text.error) != 'undefined') {
+              try{
+                resp = JSON.stringify(text, null, 2);
+                document.getElementById("response").value  = resp
+                document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+              }catch {
+                document.getElementById("response").innerHTML = text
+                document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+              }
+              console.log(text.error)
+            }
+            else {
+              try{
+                resp = JSON.stringify(text, null, 2);
+                document.getElementById("response").value  = resp
+                document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+
+              }catch {
+                document.getElementById("response").innerHTML = text
+                document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+              }
+            }
+        },
+        error: function(err, status, xhr) {
+          var statuscode = statusCode(err.status)
+          var headers = statuscode + "<BR />"
+          var responseheaders =  err.getAllResponseHeaders()
+          responseheaders = responseheaders.replace(/(?:\r\n|\r|\n)/g, '<br>')
+          headers = headers + "<hr><I>Response Headers</i><br/>\n" + responseheaders
+
+          document.getElementById("responseHeaders").innerHTML = headers
+          if (typeof err.responseJSON != "undefined") {
+            try {
+              jsonerr = JSON.stringify(err.responseJSON, null, 2)
+              document.getElementById("response").innerHTML = jsonerr
+              document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+            }catch {
+              document.getElementById("response").innerHTML = err.responseText
+              document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+            }
+          }
+          else {
+            document.getElementById("response").innerHTML = err.responseText
+            document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+          }
+            console.log(err)
+        }
+      });
+
+    }
+
+    function statusCode(code) {
+      var codes = {}
+
+      // 200 OK
+      codes['200'] = {}
+      codes['200']['message'] = "200 OK"
+      codes['200']['longtext'] = "This is the standard response for any 'successful' request.  Keep in mind many systems default to '200 OK' even when they aren't okay"
+
+      //400
+      codes['400'] = {}
+      codes['400']['message'] = "400 Bad Request"
+      codes['400']['longtext'] = "A bad request can be caused by not having the right `content-type` in the header, having a malformed payload (like improperly formatted JSON -- try jsonlint.com for a JSON validator), too large of a payload or, more rarely, special characters in your payload that can't be processed by the script"
+
+      //401
+      codes['401'] = {}
+      codes['401']['message'] = "401 Not Authorized"
+      codes['401']['longtext'] = "Either you didn't provide a token or the token is no longer valid"
+
+      //404
+      codes['404'] = {}
+      codes['404']['message'] = "404 Not Found"
+      codes['404']['longtext'] = "The resource doesn't exist at this path.  Keep in mind that a 404 can be returned because you don't have sufficient security permissions and it may be not found for *you* and only you."
+
+      console.log(codes)
+      resp = `<span id="responseCode">Response Code</span><br />\n` + codes[code]["message"]  + "</b><br />"
+      resp = resp + codes[code]["longtext"]
+
+      return resp
+    }
+
+    function buildHeaders() {
+      var headerIds = getHeaders()
+      var headers = ""
+      for (var i = 0; i < headerIds.length; i++) {
+        headers = headers + `xhr.setRequestHeader("` + document.getElementById(headerIds[i] + "-type").value + '", "' + document.getElementById(headerIds[i] + "-value").value + `");`
+      }
+    return(headers)
+    }
+  </script>
+</div>
