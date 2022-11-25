@@ -139,15 +139,21 @@
               document.getElementById("response").innerHTML = jsonerr
               document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
             }catch {
-              document.getElementById("response").innerHTML = err.responseText
+              document.getElementById("response").innerHTML = err
               document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
             }
           }
           else {
-            document.getElementById("response").innerHTML = err.responseText
-            document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+            try {
+              jsonerr = JSON.stringify(err, null, 2)
+              document.getElementById("response").innerHTML = jsonerr
+              document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+            }catch {
+              document.getElementById("response").innerHTML = err
+              document.getElementById("response").style.height = (document.getElementById("response").scrollHeight)+"px";
+            }
           }
-            console.log(err)
+          console.log(err)
         }
       });
 
@@ -176,7 +182,23 @@
       codes['404']['message'] = "404 Not Found"
       codes['404']['longtext'] = "The resource doesn't exist at this path.  Keep in mind that a 404 can be returned because you don't have sufficient security permissions and it may be not found for *you* and only you."
 
-      console.log(codes)
+      // 502 Bad Gateway
+      codes['502'] = {}
+      codes['502']['message'] = "502 Bad Gateway"
+      codes['502']['longtext'] = "This is usually a bad proxy server (something that is routing your request along the way) but could be other kinds of network errors"
+
+      //503
+      codes['503'] = {}
+      codes['503']['message'] = "503 Service Unavailable"
+      codes['503']['longtext'] = "There was a network or server error and your equest didn't make it to the API"
+
+      codes['undefined'] = {}
+      codes['undefined']['message'] = code + " is not defined"
+      codes['undefined']['longtext'] = "The server returned the code '" + code + "' and either we haven't written this kind of text for the error or it's not a normal response code."
+      if (typeof(codes[code]) == 'undefined') {
+        code = 'undefined'
+      }
+
       resp = `<span id="responseCode">Response Code</span><br />\n` + codes[code]["message"]  + "</b><br />"
       resp = resp + codes[code]["longtext"]
 
