@@ -167,6 +167,11 @@
       codes['200']['message'] = "200 OK"
       codes['200']['longtext'] = "This is the standard response for any 'successful' request.  Keep in mind many systems default to '200 OK' even when they aren't okay"
 
+      // 201 Created
+      codes['201'] = {}
+      codes['201']['message'] = "201 Created"
+      codes['201']['longtext'] = "The data you sent via POST has created a new object -- many systems will return a 200 OK on post as well, with 201 Created being much rarer"
+
       //400
       codes['400'] = {}
       codes['400']['message'] = "400 Bad Request"
@@ -181,6 +186,11 @@
       codes['404'] = {}
       codes['404']['message'] = "404 Not Found"
       codes['404']['longtext'] = "The resource doesn't exist at this path.  Keep in mind that a 404 can be returned because you don't have sufficient security permissions and it may be not found for *you* and only you."
+
+      //409
+      codes['409'] = {}
+      codes['409']['message'] = "409 Conflict"
+      codes['409']['longtext'] = "The object already exists. This error usually happens when you're trying to POST to an object rather than a collection, or POSTing when you meant to PUT."
 
       // 502 Bad Gateway
       codes['502'] = {}
@@ -213,5 +223,18 @@
       }
     return(headers)
     }
+
+    // Submit request on Enter in path field
+    var input = document.getElementById("path")
+    input.addEventListener("keypress", function(event) {
+      console.log(event)
+      // If the user presses the "Enter" key on the keyboard
+      if (event.key == "Enter") {
+        // Cancel the default action, if needed
+        event.preventDefault();
+        // Run send request function
+        sendReq();
+      }
+    });
   </script>
 </div>
