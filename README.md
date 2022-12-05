@@ -5,7 +5,9 @@ A very simple AJAX console for doing GET, POST, PUT and DELETEs embedded in a we
 
 * `/code/api-console.html`: A single div with HTML and JavaScript that runs simple GET/POST/PUT/DELETE RESTful API calls.
 
-* `/code/api-console.css`: Rudimentary style on elements in the HTML to allow for customization.
+* `/code/api-console.css`: Rudimentary style on elements in the HTML to allow for customization.  
+
+* `/code/helper-tools/jwt-dcoder.html`: A very simple JavaScript that takes a JWT, splits it into the three components, decodes them, and displays the decoded components in textareas. Note that this does not perform signature verification at this time.
 
 ## Why I wrote my own API console
 

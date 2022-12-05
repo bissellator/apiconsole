@@ -1,0 +1,79 @@
+<style>
+  .parent {
+    margin: 1rem;
+    padding: 2rem 2rem;
+    text-align: left;
+  }
+  .child {
+    display: inline-block;
+    padding: 1rem 1rem;
+    vertical-align: top;
+  }
+</style>
+
+<h1>Simple JWT decoder</h1>
+<p>
+  A very simple JavaScript that takes a JWT, splits it into the three components, decodes them, and displays the decoded components in textareas. Note that this does not perform signature verification at this time.
+</p>
+<div class='parent'>
+  <div class='child'><h5>JWT</h5>
+    <textarea id="jwt" onchange="parseJWT(this.value)" style="width:500px;height:500px">
+      eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiMThkNjVjMC0xNzgwLTExZWQtYTdjOC02ZmVkMjgzNGUxM2EiLCJzdWIiOiIyOTAxNTA3MjQ2NDU0NjQyIiwiYXVkIjoiYWxsIiwiaWRzIjp7InVzZXJzSWQiOlt7ImlkIjoiMjkwMTUwNzI0NjQ1NDY0MiIsInJvbGUiOiJvd25lciJ9XSwid29ya3NwYWNlc0lkIjpbeyJpZCI6ImQ1YjYzOTcwLTE3ODItMTFlZC1hN2M4LTZmZWQyODM0ZTEzYSIsInJvbGUiOiJvd25lciJ9XX0sInJvbGVzIjpbImV2ZXJ5b25lIl0sImp0aSI6IjVhNjZlNmZjLWEyMjEtNGRlNS1iZjM5LTFkMTY3NzY5NzE4ZCIsImlhdCI6MTY3MDEwNDg3NywiZXhwIjoxNjcwMTkxMjc3fQ.eNN7vEzmc0_7qbaPWGs7Xydq3Em3Vnr1lYfKSbYLwFM
+    </textarea>
+  </div>
+  <div class='child'><h5>Decoded Token</h5>
+    <p>Header:</p>
+    <textarea id="header" style="width:500px"></textarea>
+    <p>Body</p>
+    <textarea id="body" style="width:500px"></textarea>
+    <p>Signature</p>
+    <textarea id="sig" style="width:500px"></textarea>
+  </div>
+</div>
+<hr />
+<div id="explainations">
+  <p><B>Header:</B> Tells you what kind of encoding was used and what kind of token we're looking at (which in real life will always be JWT)</p>
+  <p><B>Body:</B> This is the main data with claims, scopes and other details that are consumed by the security plane</p>
+  <p><B>Signature:</B> The Signature string can be verified using the </p>
+</div>
+<script>
+  var params = {}
+  const urlParams = new URLSearchParams(location.search);
+    for (const [key, value] of urlParams) {
+    params[key] = value;
+  }
+
+  if(typeof(params.jwt) != 'undefined' ) {
+    document.getElementById("jwt").value = params.jwt
+    parseJWT(params.jwt)
+  }
+  else {
+    parseJWT(document.getElementById("jwt").value )
+  }
+
+  function parseJWT(jwt) {
+    // clean out whitespace
+    jwt = jwt.replace(/\n/g, '')
+    jwt = jwt.replace(/\ /g, '')
+
+    // split and display token components
+    jwt = jwt.split('.')
+
+    try {
+      document.getElementById("header").innerHTML= JSON.stringify(JSON.parse(atob(jwt[0])), null, 2)
+    }catch (err) {document.getElementById("header").innerHTML = "The Header is not properly encoded\n\n" + err }
+
+    try {
+      document.getElementById("body").innerHTML= JSON.stringify(JSON.parse(atob(jwt[1])), null, 2)
+    }catch (err) {document.getElementById("body").innerHTML = "The Body is not properly encoded\n\n" + err }
+
+    document.getElementById("sig").innerHTML= jwt[2]
+
+    // resize the textareas to show full text by height
+    document.getElementById("header").style.height = (document.getElementById("header").scrollHeight)+"px";
+    document.getElementById("body").style.height = (document.getElementById("body").scrollHeight)+"px";
+    document.getElementById("sig").style.height = (document.getElementById("sig").scrollHeight)+"px";
+
+    return
+  }
+  </script>
