@@ -39,6 +39,7 @@
         <select name="` + headerId + `-type" id="` + headerId + `-type">
           <option value=""></option>
           <option value="Content-Type">Content-Type</option>
+          <option value="Accept">Accept</option>
           <option value="Authorization">Authorization</option>
         </select>
         <input type=text style="width:50%" class="" id="` + headerId + `-value" value=""></div>`
@@ -162,6 +163,11 @@
     function statusCode(code) {
       var codes = {}
 
+      // 0
+      codes['0'] = {}
+      codes['0']['message'] = "0 Error"
+      codes['0']['longtext'] = "This is almost definitely something with Javascript trying to run and failing.  Most often, in this Ajax implementation, it's a CORS issue, which means whatever server you're making a request to won't allow you to connect so, really, no response at all has been returend."
+
       // 200 OK
       codes['200'] = {}
       codes['200']['message'] = "200 OK"
@@ -171,6 +177,11 @@
       codes['201'] = {}
       codes['201']['message'] = "201 Created"
       codes['201']['longtext'] = "The data you sent via POST has created a new object -- many systems will return a 200 OK on post as well, with 201 Created being much rarer"
+
+      // 302 Found
+      codes['302'] = {}
+      codes['302']['message'] = "302 Found"
+      codes['302']['longtext'] = "This used to be called 'Moved Temporarily' and is used to provide a response 'Location' header in the form of a URL where you can find ther resource you need. This may be used to direct you to a new location for a deprecated resource or for dynamic locaitons such as used in the Authorization Grant flow"
 
       //400
       codes['400'] = {}
